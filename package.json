@@ -1,0 +1,23 @@
+{
+  "name": "expence-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot to track expences",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alevyt/expence-bot.git"
+  },
+  "keywords": [
+    "telegram",
+    "bot"
+  ],
+  "author": "alevyt",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alevyt/expence-bot/issues"
+  },
+  "homepage": "https://github.com/alevyt/expence-bot#readme"
+}
