@@ -26,8 +26,5 @@
   "homepage": "https://github.com/alevyt/expence-bot#readme",
   "dependencies": {
     "node-telegram-bot-api": "^0.51.0"
-  },
-  "devDependencies": {
-    "nodemon": "^2.0.12"
   }
 }
