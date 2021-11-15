@@ -52,17 +52,21 @@ function getList(chatId){
   axios.get(vwApiURL+'1').then(response => {
     let totalCars = response.data.page.total;
     axios.get(vwApiURL+totalCars).then(fullResponse => {
-      fullResponse.data.cars.forEach((item, index) => {
-        keyboard.push([{
-          text: `${item.model.variant} ${item.colorData.exterior.name} ${item.dealer.city}`,
-          callback_data: item.id
-        }]);
-      })
-      bot.sendMessage(chatId, "Options:", {
-        reply_markup: {
-          inline_keyboard: keyboard
-        }
-      })
+      if(fullResponse.data.cars && fullResponse.data.cars.length){
+        fullResponse.data.cars.forEach((item, index) => {
+          keyboard.push([{
+            text: `${item.model.variant} ${item.colorData.exterior.name} ${item.dealer.city}`,
+            callback_data: item.id
+          }]);
+        })
+        bot.sendMessage(chatId, "Options:", {
+          reply_markup: {
+            inline_keyboard: keyboard
+          }
+        })
+      } else {
+        bot.sendMessage(chatId, "No cars left");
+      }
     })
   }).catch(error => {
     console.error(error)
