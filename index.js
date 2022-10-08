@@ -18,7 +18,8 @@ const pbApiUrl = `https://api.privatbank.ua/p24api/exchange_rates?json&date=${mo
 const vwApiURL = 'https://sklad.volkswagen.ua/mainframe/internal/cars/?svn=true&mg=199&hp=min%3A210&country=UA&brand=VW&filterSet=RESULT_LIST_PAGE&evaluate=true&_size=';
 
 const token = process.env.token;
-
+console.log('starting the app');
+console.log('test.token', token);
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
 
