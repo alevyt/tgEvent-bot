@@ -14,16 +14,11 @@ const moment = require('moment');
 // });
 
 const pbApiUrl = `https://api.privatbank.ua/p24api/exchange_rates?json&date=${moment(new Date()).add(-1, 'days').format('DD.MM.YYYY')}`;
-
-const vwApiURL = 'https://sklad.volkswagen.ua/mainframe/internal/cars/?svn=true&mg=199&hp=min%3A210&country=UA&brand=VW&filterSet=RESULT_LIST_PAGE&evaluate=true&_size=';
-console.log('env vars', process.env);
 const token = process.env.token;
-console.log('starting the app');
-console.log('test.token', token);
+
+
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
-
-
 
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
@@ -32,10 +27,6 @@ bot.on('message', (msg) => {
     reply_markup: {
       inline_keyboard: [
         [
-          {
-            text: "Get List",
-            callback_data: 'getList'
-          },
           {
             text: "Exchange Rate",
             callback_data: "exchange"
@@ -47,31 +38,6 @@ bot.on('message', (msg) => {
 });
 
 const keyboard = [];
-
-function getList(chatId){
-  axios.get(vwApiURL+'1').then(response => {
-    let totalCars = response.data.page.total;
-    axios.get(vwApiURL+totalCars).then(fullResponse => {
-      if(fullResponse.data.cars && fullResponse.data.cars.length){
-        fullResponse.data.cars.forEach((item, index) => {
-          keyboard.push([{
-            text: `${item.model.variant} ${item.colorData.exterior.name} ${item.dealer.city}`,
-            callback_data: item.id
-          }]);
-        })
-        bot.sendMessage(chatId, "Options:", {
-          reply_markup: {
-            inline_keyboard: keyboard
-          }
-        })
-      } else {
-        bot.sendMessage(chatId, "No cars left");
-      }
-    })
-  }).catch(error => {
-    console.error(error)
-  })
-}
 
 function exchange(chatId){
   axios.get(pbApiUrl).then(response => {
@@ -99,7 +65,6 @@ bot.on('callback_query', query => {
   
 
   switch (query.data){
-    case 'getList': getList(chatId); break;
     case 'exchange': exchange(chatId); break;
     default: defaultMessage(chatId, query.data);
   }
