@@ -16,7 +16,7 @@ const moment = require('moment');
 const pbApiUrl = `https://api.privatbank.ua/p24api/exchange_rates?json&date=${moment(new Date()).add(-1, 'days').format('DD.MM.YYYY')}`;
 
 const vwApiURL = 'https://sklad.volkswagen.ua/mainframe/internal/cars/?svn=true&mg=199&hp=min%3A210&country=UA&brand=VW&filterSet=RESULT_LIST_PAGE&evaluate=true&_size=';
-
+console.log('env vars', process.env);
 const token = process.env.token;
 console.log('starting the app');
 console.log('test.token', token);
