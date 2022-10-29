@@ -54,6 +54,16 @@ function exchange(chatId){
     })
 }
 
+function about(chatId){
+  bot.sendMessage(chatId, "This is a test bot for creating events")
+}
+
+function newEvent(chatId, quesry){
+  const message = quesry;
+  bot.sendMessage(chatId, message);
+  
+}
+
 function defaultMessage(chatId, data){
   bot.sendMessage(chatId, '?');
   console.log(data);
@@ -66,6 +76,8 @@ bot.on('callback_query', query => {
 
   switch (query.data){
     case 'exchange': exchange(chatId); break;
+    case 'about': about(chatId); break;
+    case 'new_event': newEvent(chatId, query); break;
     default: defaultMessage(chatId, query.data);
   }
   
