@@ -29,7 +29,7 @@ bot.on('message', (msg) => {
         [
           {
             text: "Exchange Rate",
-            callback_data: "exchange"
+            callback_data: "/exchange"
           }
         ]
       ]
@@ -75,9 +75,9 @@ bot.on('callback_query', query => {
   
 
   switch (query.data){
-    case 'exchange': exchange(chatId); break;
-    case 'about': about(chatId); break;
-    case 'new_event': newEvent(chatId, query); break;
+    case '/exchange': exchange(chatId); break;
+    case '/about': about(chatId); break;
+    case '/new_event': newEvent(chatId, query); break;
     default: defaultMessage(chatId, query.data);
   }
   
