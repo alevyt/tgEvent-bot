@@ -1,45 +1,85 @@
+
 const TelegramBot = require('node-telegram-bot-api');
+const { Configuration, OpenAIApi } = require("openai");
 const axios = require('axios');
 const moment = require('moment');
-// const csv = require('csv-parser');
-// const createCsvWriter = require('csv-writer').createObjectCsvWriter;
-// const csvWriter = createCsvWriter({
-//   path: './data/testdata.csv',
-//   // append: true,
-//   header: [
-//     {id: 'name', title: 'Name'},
-//     {id: 'date', title: 'Date'},
-//     {id: 'amount', title: 'Amount'},
-//   ]
-// });
+
+
+const token = '',
+      openAiConfig = {};
+if(process.env.NODE_ENV === 'production'){
+  console.log('prod');
+  const openAiConfig = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY
+  })
+  const token = process.env.token;
+} else {
+  console.log('local');
+  (async function(){
+    config = await require('./local.config.json');
+    openAiConfig = new Configuration({
+      apiKey: config.OPENAI_API_KEY
+    })
+    token = config.token;
+  })()
+}
 
 const pbApiUrl = `https://api.privatbank.ua/p24api/exchange_rates?json&date=${moment(new Date()).add(-1, 'days').format('DD.MM.YYYY')}`;
-const token = process.env.token;
+const openai = new OpenAIApi(openAiConfig);
 
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, {polling: true});
 
+async function createCompletion(promt){
+  return completion = await openai.createCompletion({
+    model: "text-davinci-003",
+    prompt: promt,
+  });
+}
+
 bot.on('message', (msg) => {
   const chatId = msg.chat.id;
-  // bot.sendMessage(chatId, `Your message '${msg.text}' was recieved`);
-  bot.sendMessage(chatId, "Options:", {
-    reply_markup: {
-      inline_keyboard: [
-        [
-          {
-            text: "Exchange Rate",
-            callback_data: "/exchange"
-          }
-        ]
-      ]
+  bot.sendMessage(chatId, `Your message '${msg.text}' was recieved`);
+  if(msg.text.toString().startsWith('bot')){
+    console.log(`asking bot ${msg.text.slice(4)}`)
+    try {
+      let completion = createCompletion("Are you active right now?")
+      console.log('completion', completion.data.choices[0].text);
+    } catch (error) {
+      if (error.response) {
+        console.log(error.response.status);
+        console.log(error.response.data);
+      } else {
+        console.log(error.message);
       }
-    })
+    }
+  } else{
+    bot.sendMessage(chatId, "Options:", {
+      reply_markup: {
+        inline_keyboard: [
+          [
+            {
+              text: "Exchange Rate",
+              callback_data: "/exchange"
+            },
+            {
+              text: "About",
+              callback_data: "/about"
+            },
+            {
+              text: "New Event",
+              callback_data: "/new_event"
+            }
+          ]
+        ]
+        }
+      })
+  }
 });
 
-const keyboard = [];
-
 function exchange(chatId){
+  console.log('showing exchange rate');
   axios.get(pbApiUrl).then(response => {
       let rates = response.data.exchangeRate
       let rate = '';
@@ -54,29 +94,33 @@ function exchange(chatId){
     })
 }
 
-function about(chatId){
-  bot.sendMessage(chatId, "This is a test bot for creating events")
+function about(chatId, query){
+  // console.log(chatId, query);
+  bot.sendMessage(chatId, `Hi ${query.from.first_name}! This is a test bot for creating events`)
 }
 
-function newEvent(chatId, quesry){
-  const message = quesry;
-  bot.sendMessage(chatId, message);
+function newEvent(chatId, query){
+  const message = query;
+  bot.sendMessage(chatId, "Event name");
   
 }
 
 function defaultMessage(chatId, data){
   bot.sendMessage(chatId, '?');
-  console.log(data);
 }
 
+bot.onText(/\/echo (.+)/, (msg, match) => {
+  console.log('message', msg);
+  const chatId = msg.chat.id;
+})
+
 bot.on('callback_query', query => {
-  // console.log(query)
   let chatId = query.message.chat.id;
-  
+  console.log('callback_query', query);
 
   switch (query.data){
     case '/exchange': exchange(chatId); break;
-    case '/about': about(chatId); break;
+    case '/about': about(chatId, query); break;
     case '/new_event': newEvent(chatId, query); break;
     default: defaultMessage(chatId, query.data);
   }
