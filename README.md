@@ -1,3 +1,3 @@
-# expence-bot
+# Quiz-bot
 
 Test bot
