@@ -62,7 +62,7 @@ class Bot {
         correct_option_id: null
       };
   
-      await this.bot.sendPoll(chatId, description, ['Yes', 'No']);
+      await this.bot.sendPoll(chatId, description, ['Yes', 'No'], { public_voters: true});
   
     } catch (error) {
       console.error(error);
